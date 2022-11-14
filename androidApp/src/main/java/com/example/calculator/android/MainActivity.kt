@@ -16,7 +16,8 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.calculator.*
+import com.example.calculator.Calculator
+import com.example.calculator.InputValidationHelper
 
 @Composable
 fun MyApplicationTheme(
@@ -82,36 +83,10 @@ class MainActivity : ComponentActivity() {
 	}
 }
 
-// TODO: Why are composable methods capitalized?
 @Composable
 fun InputButtons(calculator: Calculator) {
-	// TODO: Are input values only available in the scope of the composable?
-	var operation by remember { mutableStateOf("") }
 	var output by remember { mutableStateOf("") }
-
-	val onOperationClicked: (String) -> Unit = {
-		if (output.isNotEmpty()) {
-			output =
-				if (output.contains(" ")) output.replace(operation, it)
-				else "$output $it "
-
-			operation = it
-		}
-	}
-
-	val onEqualsClicked: (String) -> Unit = {
-		if (operation.isNotEmpty() && output.last() != ' ') {
-			val parts = output.split(" ")
-			val num1 = parts[0].toDouble()
-			val num2 = parts[2].toDouble()
-			val operator = parts[1]
-
-			val result = calculator.equals(num1, num2, operator)
-
-			output = result.toString()
-			operation = ""
-		}
-	}
+	val updateOutput = { entry: String -> output = InputValidationHelper.validateInput(output, entry) }
 
 	Column(
 		horizontalAlignment = Alignment.CenterHorizontally,
@@ -131,42 +106,40 @@ fun InputButtons(calculator: Calculator) {
 			Column(
 				modifier = Modifier.weight(1f, true)
 			) {
-				NumberPad { number ->
-					output += number
+				NumberRow {
+					InputButton(onClick = updateOutput, number = "7")
+					InputButton(onClick = updateOutput, number = "8")
+					InputButton(onClick = updateOutput, number = "9")
 				}
-
-				ClearButton {
-					output = ""
-					operation = ""
+				NumberRow {
+					InputButton(onClick = updateOutput, number = "4")
+					InputButton(onClick = updateOutput, number = "5")
+					InputButton(onClick = updateOutput, number = "6")
+				}
+				NumberRow {
+					InputButton(onClick = updateOutput, number = "1")
+					InputButton(onClick = updateOutput, number = "2")
+					InputButton(onClick = updateOutput, number = "3")
+				}
+				NumberRow {
+					InputButton(onClick = updateOutput, number = ".")
+					InputButton(onClick = updateOutput, number = "0")
+					InputButton(onClick = updateOutput, number = "0")
 				}
 			}
 			Column {
-				OperationPad(onOperationClicked)
-				OperationButton(onEqualsClicked, OPERATION_CALCULATE)
+				OperationButton(operation = Calculator.Operation.ADD, updateOutput)
+				OperationButton(operation = Calculator.Operation.SUBTRACT, updateOutput)
+				OperationButton(operation = Calculator.Operation.MULTIPLY, updateOutput)
+				OperationButton(operation = Calculator.Operation.DIVIDE, updateOutput)
+				Button(
+					onClick = { output = calculator.calculate(output) },
+					colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFaeea00))
+				) {
+					Text(text = "=")
+				}
 			}
 		}
-	}
-}
-
-@Composable
-fun NumberPad(onDigitClicked: (Int) -> Unit) {
-	NumberRow {
-		NumberButton(onClick = onDigitClicked, number = 7)
-		NumberButton(onClick = onDigitClicked, number = 8)
-		NumberButton(onClick = onDigitClicked, number = 9)
-	}
-	NumberRow {
-		NumberButton(onClick = onDigitClicked, number = 4)
-		NumberButton(onClick = onDigitClicked, number = 5)
-		NumberButton(onClick = onDigitClicked, number = 6)
-	}
-	NumberRow {
-		NumberButton(onClick = onDigitClicked, number = 1)
-		NumberButton(onClick = onDigitClicked, number = 2)
-		NumberButton(onClick = onDigitClicked, number = 3)
-	}
-	NumberRow {
-		NumberButton(onClick = onDigitClicked, number = 0)
 	}
 }
 
@@ -181,45 +154,21 @@ fun NumberRow(content: @Composable RowScope.() -> Unit) {
 }
 
 @Composable
-fun NumberButton(onClick: (Int) -> Unit, number: Int) {
-	// TODO: How do you style the buttons?
+fun RowScope.InputButton(number: String, onClick: (String) -> Unit) {
 	Button(
 		onClick = { onClick.invoke(number) },
+		modifier = Modifier.weight(1f, true)
+	) {
+		Text(text = number)
+	}
+}
+
+@Composable
+fun OperationButton(operation: Calculator.Operation, onClick: (String) -> Unit) {
+	Button(
+		onClick = { onClick.invoke(operation.symbol) },
 		colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFaeea00))
 	) {
-		Text(text = number.toString())
+		Text(text = operation.symbol)
 	}
 }
-
-@Composable
-fun OperationPad(onOperationClicked: (String) -> Unit) {
-	OperationButton(onClick = onOperationClicked, operation = OPERATION_ADD)
-	OperationButton(onClick = onOperationClicked, operation = OPERATION_SUBTRACT)
-	OperationButton(onClick = onOperationClicked, operation = OPERATION_MULTIPLY)
-	OperationButton(onClick = onOperationClicked, operation = OPERATION_DIVIDE)
-}
-
-@Composable
-fun OperationButton(onClick: (String) -> Unit, operation: String) {
-	Button(
-		onClick = { onClick.invoke(operation) }
-	) {
-		Text(text = operation)
-	}
-}
-
-
-@Composable
-fun ClearButton(onClick: () -> Unit) {
-	Button(
-		onClick = onClick,
-		modifier = Modifier.fillMaxWidth(),
-		colors = ButtonDefaults.buttonColors(backgroundColor = Color.LightGray)
-	) {
-		Text(
-			text = "CLEAR ALL",
-			color = Color.Black
-		)
-	}
-}
-

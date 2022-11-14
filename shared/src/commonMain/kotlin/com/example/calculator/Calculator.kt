@@ -1,27 +1,41 @@
 package com.example.calculator
 
-const val OPERATION_ADD = "+"
-const val OPERATION_SUBTRACT = "-"
-const val OPERATION_MULTIPLY = "x"
-const val OPERATION_DIVIDE = "/"
-const val OPERATION_CALCULATE = "="
-
 class Calculator {
 
-	fun equals(num1: Double, num2: Double, operationType: String): Double {
+	enum class Operation(val symbol: String) {
+		ADD("+"),
+		SUBTRACT("-"),
+		MULTIPLY("x"),
+		DIVIDE("/"),
+	}
+
+	fun calculate(expression: String): String {
+		return calculateOrderOfOperations(expression)
+	}
+
+	private fun calculateOrderOfOperations(expression: String): String {
+		// Order of operations: PEMDAS
+		// Parenthesis > Exponents > Multiplication || Division > Addition || Subtraction
+		// Ex: 2 + (1 * 5)^2 - 4 / 2
+		// --> 2 + (5)^2 - 4 / 2
+		// --> 2 + 25 - 4 / 2
+		// --> 2 + 25 - 2
+		// --> 27 - 2
+		// --> 25
+
+		// TODO: Implement this
+
+		return expression
+	}
+
+	private fun calculate(num1: Double, num2: Double, operation: Operation): Double {
 		if (num1 == 0.0 && num2 == 0.0) return 0.0
-
-		if (operationType.isNotEmpty()) {
-			return when (operationType) {
-				OPERATION_ADD -> add(num1, num2)
-				OPERATION_SUBTRACT -> subtract(num1, num2)
-				OPERATION_MULTIPLY -> multiply(num1, num2)
-				OPERATION_DIVIDE -> divide(num1, num2)
-				else -> throw IllegalArgumentException("Unknown operation type")
-			}
+		return when (operation) {
+			Operation.ADD -> add(num1, num2)
+			Operation.SUBTRACT -> subtract(num1, num2)
+			Operation.MULTIPLY -> multiply(num1, num2)
+			Operation.DIVIDE -> divide(num1, num2)
 		}
-
-		throw IllegalArgumentException("Operation type must be specified")
 	}
 
 	private fun add(augend: Double, addend: Double): Double {
