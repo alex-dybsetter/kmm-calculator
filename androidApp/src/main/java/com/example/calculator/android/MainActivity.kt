@@ -3,15 +3,16 @@ package com.example.calculator.android
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.unit.dp
 import com.example.calculator.Calculator
+import com.example.calculator.android.components.OutlinedButton
+import com.example.calculator.android.components.VerticallyCenteredText
 import com.example.calculator.android.ui.theme.*
 
 class MainActivity : ComponentActivity() {
@@ -26,44 +27,61 @@ class MainActivity : ComponentActivity() {
 @Composable
 private fun App(calculator: Calculator) {
 	var expression by remember { mutableStateOf("") }
-	val operations = getOperations()
+	var calculation by remember { mutableStateOf("") }
+	val operations = calculator.getOperations()
 
 	Surface {
 		Column {
-			val equalDistributionModifier = Modifier.weight(1f, true)
-			val buttonModifier = Modifier
-				.fillMaxHeight()
-				.weight(1f, true)
-				.border(width = 1.dp, color = Color.White)
-
-			OutputField(
-				expression = expression,
-				modifier = equalDistributionModifier
+			VerticallyCenteredText(
+				modifier = Modifier.weight(1.2f, true),
+				text = expression,
+				textStyle = inputTextStyle
 			)
+
+			VerticallyCenteredText(
+				modifier = Modifier
+					.weight(.8f, true)
+					.alpha(.75f),
+				text = calculation,
+				textStyle = outputTextStyle
+			)
+
+			val equalDistributionModifier = Modifier.weight(1f, true)
 			Row(modifier = equalDistributionModifier) {
+				OutlinedButton(
+					modifier = equalDistributionModifier,
+					text = "AC",
+					colorScheme = expressionModifierButtonStyle()
+				) {
+					expression = ""
+					calculation = ""
+				}
 
-				OutputModifierButton(
-					modifier = buttonModifier,
-					label = "AC"
-				) { expression = "" }
+				OutlinedButton(
+					modifier = equalDistributionModifier,
+					text = "+/-",
+					colorScheme = expressionModifierButtonStyle()
+				) {
+					expression = calculator.numberSignChanged(expression)
+					calculation = calculator.calculate(expression)
+				}
 
-				OutputModifierButton(
-					modifier = buttonModifier,
-					label = "+/-"
-				) { expression = calculator.numberSignChanged(expression) }
+				OutlinedButton(
+					modifier = equalDistributionModifier,
+					text = "%",
+					colorScheme = expressionModifierButtonStyle()
+				) {
+					expression += "%"
+					calculation = calculator.percentage(expression)
+				}
 
-				OutputModifierButton(
-					modifier = buttonModifier,
-					label = "%"
-				) { expression = calculator.percentage(expression) }
-
-				OperationButtonStyle {
-					Button(
-						onClick = { /*TODO*/ },
-						modifier = buttonModifier
-					) {
-						Text(text = operations[0])
-					}
+				OutlinedButton(
+					modifier = equalDistributionModifier,
+					text = operations[0],
+					colorScheme = operationButtonStyle()
+				) {
+					expression = calculator.onOperationClicked(operations[0])
+					calculation = ""
 				}
 			}
 			NumberPad(
@@ -71,66 +89,30 @@ private fun App(calculator: Calculator) {
 				modifier = equalDistributionModifier
 			)
 			Row(modifier = equalDistributionModifier) {
-				NumberButtonStyle {
-					Button(
-						onClick = { },
-						modifier = Modifier
-							.fillMaxHeight()
-							.weight(2f, true)
-							.border(width = 1.dp, color = Color.White)
-					) {
-						Text(text = "0")
-					}
-
-					Button(
-						onClick = { },
-						modifier = buttonModifier
-					) {
-						Text(text = ".")
-					}
+				OutlinedButton(
+					modifier = Modifier.weight(2f, true),
+					text = "0",
+					colorScheme = numberButtonStyle()
+				) {
+					// todo
 				}
 
-				OperationButtonStyle {
-					Button(
-						onClick = { /*TODO*/ },
-						modifier = buttonModifier
-					) {
-						Text("=")
-					}
+				OutlinedButton(
+					modifier = equalDistributionModifier,
+					text = ".",
+					colorScheme = numberButtonStyle()
+				) {
+					// todo
+				}
+
+				OutlinedButton(
+					modifier = equalDistributionModifier,
+					text = "=",
+					colorScheme = operationButtonStyle()
+				) {
+					// todo
 				}
 			}
-		}
-	}
-}
-
-@Composable
-private fun OutputField(
-	expression: String,
-	modifier: Modifier = Modifier
-) {
-	TextField(
-		value = expression,
-		onValueChange = {},
-		modifier = modifier
-			.fillMaxWidth()
-			.border(width = 2.dp, color = Color.White),
-		readOnly = true,
-		textStyle = outputTextStyle
-	)
-}
-
-@Composable
-private fun OutputModifierButton(
-	modifier: Modifier = Modifier,
-	label: String,
-	onClick: () -> Unit
-) {
-	OutputModifierButtonStyle {
-		Button(
-			onClick = { onClick() },
-			modifier = modifier.fillMaxHeight()
-		) {
-			Text(text = label)
 		}
 	}
 }
@@ -146,15 +128,12 @@ private fun NumberPad(
 			firstNumInRow = x,
 			modifier = modifier
 		) {
-			OperationButtonStyle {
-				Button(
-					onClick = { /*TODO*/ },
-					modifier = modifier
-						.fillMaxHeight()
-						.border(width = 1.dp, color = Color.White)
-				) {
-					Text(text = operations[i++])
-				}
+			OutlinedButton(
+				modifier = modifier,
+				text = operations[i++],
+				colorScheme = operationButtonStyle()
+			) {
+				// todo
 			}
 		}
 	}
@@ -170,42 +149,30 @@ fun NumberRow(
 		horizontalArrangement = Arrangement.spacedBy(0.dp, Alignment.CenterHorizontally),
 		modifier = modifier.fillMaxWidth()
 	) {
-		val buttonModifier = modifier
-			.fillMaxHeight()
-			.border(width = 1.dp, color = Color.White)
+		OutlinedButton(
+			modifier = modifier,
+			text = "$firstNumInRow",
+			colorScheme = numberButtonStyle()
+		) {
+			// todo
+		}
 
-		NumberButtonStyle {
-			Button(
-				onClick = { },
-				modifier = buttonModifier
-			) {
-				Text(text = "$firstNumInRow")
-			}
+		OutlinedButton(
+			modifier = modifier,
+			text = "${firstNumInRow + 1}",
+			colorScheme = numberButtonStyle()
+		) {
+			// todo
+		}
 
-			Button(
-				onClick = { },
-				modifier = buttonModifier
-			) {
-				Text(text = "${firstNumInRow + 1}")
-			}
-
-			Button(
-				onClick = { },
-				modifier = buttonModifier
-			) {
-				Text(text = "${firstNumInRow + 2}")
-			}
+		OutlinedButton(
+			modifier = modifier,
+			text = "${firstNumInRow + 2}",
+			colorScheme = numberButtonStyle()
+		) {
+			// todo
 		}
 
 		content()
 	}
-}
-
-private fun getOperations(): Array<String> {
-	return arrayOf(
-		Calculator.Operation.DIVIDE.symbol,
-		Calculator.Operation.MULTIPLY.symbol,
-		Calculator.Operation.ADD.symbol,
-		Calculator.Operation.SUBTRACT.symbol,
-	)
 }

@@ -1,16 +1,9 @@
 package com.example.calculator.android.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.shape.CutCornerShape
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.darkColors
-import androidx.compose.material.lightColors
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 
 private val DarkColorPalette = darkColors(
 	primary = primaryDark,
@@ -38,8 +31,6 @@ private val LightColorPalette = lightColors(
     */
 )
 
-val outputModifierButtonStyle = null
-
 @Composable
 fun CalculatorAppTheme(
 	darkTheme: Boolean = isSystemInDarkTheme(),
@@ -58,34 +49,28 @@ fun CalculatorAppTheme(
 }
 
 @Composable
-fun NumberButtonStyle(content: @Composable () -> Unit) {
-	MaterialTheme { content() }
+fun numberButtonStyle(
+	darkTheme: Boolean = isSystemInDarkTheme()
+): ButtonColors {
+	return ButtonDefaults.buttonColors(
+		backgroundColor = if (darkTheme) primaryDark else primaryLight
+	)
 }
 
 @Composable
-fun OperationButtonStyle(
-	darkTheme: Boolean = isSystemInDarkTheme(),
-	content: @Composable () -> Unit
-) {
-	MaterialTheme(
-		colors = MaterialTheme.colors.copy(
-			primary = if (darkTheme) accentDark else accentLight
-		)
-	) {
-		content()
-	}
+fun operationButtonStyle(
+	darkTheme: Boolean = isSystemInDarkTheme()
+): ButtonColors {
+	return ButtonDefaults.buttonColors(
+		backgroundColor = if (darkTheme) accentDark else accentLight
+	)
 }
 
 @Composable
-fun OutputModifierButtonStyle(
-	darkTheme: Boolean = isSystemInDarkTheme(),
-	content: @Composable () -> Unit
-) {
-	MaterialTheme(
-		colors = MaterialTheme.colors.copy(
-			primary = if (darkTheme) primaryVariantDark else primaryVariantLight
-		)
-	) {
-		content()
-	}
+fun expressionModifierButtonStyle(
+	darkTheme: Boolean = isSystemInDarkTheme()
+): ButtonColors {
+	return ButtonDefaults.buttonColors(
+		backgroundColor = if (darkTheme) primaryVariantDark else primaryVariantLight
+	)
 }

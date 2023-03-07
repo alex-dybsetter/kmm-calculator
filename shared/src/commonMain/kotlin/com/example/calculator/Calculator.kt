@@ -9,6 +9,19 @@ class Calculator {
 		DIVIDE("/"),
 	}
 
+	fun getOperations(): Array<String> {
+		return arrayOf(
+			Operation.DIVIDE.symbol,
+			Operation.MULTIPLY.symbol,
+			Operation.ADD.symbol,
+			Operation.SUBTRACT.symbol,
+		)
+	}
+
+	fun onOperationClicked(symbol: String): String {
+		return ""
+	}
+
 	fun calculate(expression: String): String {
 		return calculateOrderOfOperations(expression)
 	}
