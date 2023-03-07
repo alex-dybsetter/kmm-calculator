@@ -3,80 +3,100 @@ package com.example.calculator.android
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.calculator.Calculator
-import com.example.calculator.InputValidationHelper
-
-@Composable
-fun MyApplicationTheme(
-	darkTheme: Boolean = isSystemInDarkTheme(),
-	content: @Composable () -> Unit
-) {
-	val colors = if (darkTheme) {
-		darkColors(
-			primary = Color(0xFF546e7a),
-			primaryVariant = Color(0xFF29434e),
-			secondary = Color(0xFFaeea00),
-			background = Color(0xFF37474f),
-			onPrimary = Color.White,
-			onSecondary = Color.Black,
-			onBackground = Color.White,
-		)
-	} else {
-		lightColors(
-			primary = Color(0xFF819ca9),
-			primaryVariant = Color(0xFF546e7a),
-			secondary = Color(0xFFaeea00),
-			background = Color(0xFFeceff1),
-			onPrimary = Color.Black,
-			onSecondary = Color.Black,
-			onBackground = Color.Black,
-		)
-	}
-	val typography = Typography(
-		body1 = TextStyle(
-			fontFamily = FontFamily.Default,
-			fontWeight = FontWeight.Normal,
-			fontSize = 16.sp
-		)
-	)
-	val shapes = Shapes(
-		small = RoundedCornerShape(4.dp),
-		medium = RoundedCornerShape(4.dp),
-		large = RoundedCornerShape(0.dp)
-	)
-
-	MaterialTheme(
-		colors = colors,
-		typography = typography,
-		shapes = shapes,
-		content = content
-	)
-}
+import com.example.calculator.android.ui.theme.*
 
 class MainActivity : ComponentActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		setContent {
-			MyApplicationTheme {
-				Surface(
-					modifier = Modifier.fillMaxSize(),
-					color = MaterialTheme.colors.background
-				) {
-					val calculator = Calculator()
-					InputButtons(calculator)
+			CalculatorAppTheme { App(Calculator()) }
+		}
+	}
+}
+
+@Composable
+private fun App(calculator: Calculator) {
+	var expression by remember { mutableStateOf("") }
+	val operations = getOperations()
+
+	Surface {
+		Column {
+			val equalDistributionModifier = Modifier.weight(1f, true)
+			val buttonModifier = Modifier
+				.fillMaxHeight()
+				.weight(1f, true)
+				.border(width = 1.dp, color = Color.White)
+
+			OutputField(
+				expression = expression,
+				modifier = equalDistributionModifier
+			)
+			Row(modifier = equalDistributionModifier) {
+
+				OutputModifierButton(
+					modifier = buttonModifier,
+					label = "AC"
+				) { expression = "" }
+
+				OutputModifierButton(
+					modifier = buttonModifier,
+					label = "+/-"
+				) { expression = calculator.numberSignChanged(expression) }
+
+				OutputModifierButton(
+					modifier = buttonModifier,
+					label = "%"
+				) { expression = calculator.percentage(expression) }
+
+				OperationButtonStyle {
+					Button(
+						onClick = { /*TODO*/ },
+						modifier = buttonModifier
+					) {
+						Text(text = operations[0])
+					}
+				}
+			}
+			NumberPad(
+				operations = operations,
+				modifier = equalDistributionModifier
+			)
+			Row(modifier = equalDistributionModifier) {
+				NumberButtonStyle {
+					Button(
+						onClick = { },
+						modifier = Modifier
+							.fillMaxHeight()
+							.weight(2f, true)
+							.border(width = 1.dp, color = Color.White)
+					) {
+						Text(text = "0")
+					}
+
+					Button(
+						onClick = { },
+						modifier = buttonModifier
+					) {
+						Text(text = ".")
+					}
+				}
+
+				OperationButtonStyle {
+					Button(
+						onClick = { /*TODO*/ },
+						modifier = buttonModifier
+					) {
+						Text("=")
+					}
 				}
 			}
 		}
@@ -84,59 +104,56 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun InputButtons(calculator: Calculator) {
-	var output by remember { mutableStateOf("") }
-	val updateOutput = { entry: String -> output = InputValidationHelper.validateInput(output, entry) }
+private fun OutputField(
+	expression: String,
+	modifier: Modifier = Modifier
+) {
+	TextField(
+		value = expression,
+		onValueChange = {},
+		modifier = modifier
+			.fillMaxWidth()
+			.border(width = 2.dp, color = Color.White),
+		readOnly = true,
+		textStyle = outputTextStyle
+	)
+}
 
-	Column(
-		horizontalAlignment = Alignment.CenterHorizontally,
-
+@Composable
+private fun OutputModifierButton(
+	modifier: Modifier = Modifier,
+	label: String,
+	onClick: () -> Unit
+) {
+	OutputModifierButtonStyle {
+		Button(
+			onClick = { onClick() },
+			modifier = modifier.fillMaxHeight()
 		) {
-		TextField(
-			value = output,
-			onValueChange = { output = it },
-			readOnly = true,
-			modifier = Modifier.fillMaxWidth()
-		)
+			Text(text = label)
+		}
+	}
+}
 
-		Row(
-			modifier = Modifier.padding(16.dp),
-			horizontalArrangement = Arrangement.spacedBy(16.dp),
+@Composable
+private fun NumberPad(
+	operations: Array<String>,
+	modifier: Modifier = Modifier
+) {
+	var i = 1
+	for (x in 7 downTo 1 step 3) {
+		NumberRow(
+			firstNumInRow = x,
+			modifier = modifier
 		) {
-			Column(
-				modifier = Modifier.weight(1f, true)
-			) {
-				NumberRow {
-					InputButton(onClick = updateOutput, number = "7")
-					InputButton(onClick = updateOutput, number = "8")
-					InputButton(onClick = updateOutput, number = "9")
-				}
-				NumberRow {
-					InputButton(onClick = updateOutput, number = "4")
-					InputButton(onClick = updateOutput, number = "5")
-					InputButton(onClick = updateOutput, number = "6")
-				}
-				NumberRow {
-					InputButton(onClick = updateOutput, number = "1")
-					InputButton(onClick = updateOutput, number = "2")
-					InputButton(onClick = updateOutput, number = "3")
-				}
-				NumberRow {
-					InputButton(onClick = updateOutput, number = ".")
-					InputButton(onClick = updateOutput, number = "0")
-					InputButton(onClick = updateOutput, number = "0")
-				}
-			}
-			Column {
-				OperationButton(operation = Calculator.Operation.ADD, updateOutput)
-				OperationButton(operation = Calculator.Operation.SUBTRACT, updateOutput)
-				OperationButton(operation = Calculator.Operation.MULTIPLY, updateOutput)
-				OperationButton(operation = Calculator.Operation.DIVIDE, updateOutput)
+			OperationButtonStyle {
 				Button(
-					onClick = { output = calculator.calculate(output) },
-					colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFaeea00))
+					onClick = { /*TODO*/ },
+					modifier = modifier
+						.fillMaxHeight()
+						.border(width = 1.dp, color = Color.White)
 				) {
-					Text(text = "=")
+					Text(text = operations[i++])
 				}
 			}
 		}
@@ -144,31 +161,51 @@ fun InputButtons(calculator: Calculator) {
 }
 
 @Composable
-fun NumberRow(content: @Composable RowScope.() -> Unit) {
+fun NumberRow(
+	firstNumInRow: Int,
+	modifier: Modifier = Modifier,
+	content: @Composable RowScope.() -> Unit
+) {
 	Row(
-		horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
-		modifier = Modifier.fillMaxWidth()
+		horizontalArrangement = Arrangement.spacedBy(0.dp, Alignment.CenterHorizontally),
+		modifier = modifier.fillMaxWidth()
 	) {
+		val buttonModifier = modifier
+			.fillMaxHeight()
+			.border(width = 1.dp, color = Color.White)
+
+		NumberButtonStyle {
+			Button(
+				onClick = { },
+				modifier = buttonModifier
+			) {
+				Text(text = "$firstNumInRow")
+			}
+
+			Button(
+				onClick = { },
+				modifier = buttonModifier
+			) {
+				Text(text = "${firstNumInRow + 1}")
+			}
+
+			Button(
+				onClick = { },
+				modifier = buttonModifier
+			) {
+				Text(text = "${firstNumInRow + 2}")
+			}
+		}
+
 		content()
 	}
 }
 
-@Composable
-fun RowScope.InputButton(number: String, onClick: (String) -> Unit) {
-	Button(
-		onClick = { onClick.invoke(number) },
-		modifier = Modifier.weight(1f, true)
-	) {
-		Text(text = number)
-	}
-}
-
-@Composable
-fun OperationButton(operation: Calculator.Operation, onClick: (String) -> Unit) {
-	Button(
-		onClick = { onClick.invoke(operation.symbol) },
-		colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFaeea00))
-	) {
-		Text(text = operation.symbol)
-	}
+private fun getOperations(): Array<String> {
+	return arrayOf(
+		Calculator.Operation.DIVIDE.symbol,
+		Calculator.Operation.MULTIPLY.symbol,
+		Calculator.Operation.ADD.symbol,
+		Calculator.Operation.SUBTRACT.symbol,
+	)
 }

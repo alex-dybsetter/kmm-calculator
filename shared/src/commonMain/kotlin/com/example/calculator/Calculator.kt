@@ -13,6 +13,16 @@ class Calculator {
 		return calculateOrderOfOperations(expression)
 	}
 
+	fun numberSignChanged(expression: String): String {
+		// TODO
+		return ""
+	}
+
+	fun percentage(expression: String): String {
+		// TODO
+		return ""
+	}
+
 	private fun calculateOrderOfOperations(expression: String): String {
 		// Order of operations: PEMDAS
 		// Parenthesis > Exponents > Multiplication || Division > Addition || Subtraction
@@ -23,7 +33,8 @@ class Calculator {
 		// --> 27 - 2
 		// --> 25
 
-		// TODO: Implement this
+		// find the inner most parenthesis
+
 
 		return expression
 	}
