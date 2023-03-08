@@ -1,15 +1,15 @@
 package com.example.calculator
 
-const val allCancelButton = "AC"
-const val deleteButton = "DEL"
-const val percentButton = "%"
-const val decimalButton = "."
+const val ALL_CANCEL_BUTTON = "AC"
+const val DELETE_BUTTON = "DEL"
+const val PERCENT_BUTTON = "%"
+const val DECIMAL_BUTTON = "."
 
-const val addButton = "+"
-const val subtractButton = "-"
-const val multiplyButton = "x"
-const val divideButton = "/"
-const val equalsButton = "="
+const val ADD_BUTTON = "+"
+const val SUBTRACT_BUTTON = "-"
+const val MULTIPLY_BUTTON = "x"
+const val DIVIDE_BUTTON = "/"
+const val EQUALS_BUTTON = "="
 
-const val defaultOutput = "0"
-const val defaultInput = "0"
+const val DEFAULT_OUTPUT = "0"
+const val DEFAULT_INPUT = "0"

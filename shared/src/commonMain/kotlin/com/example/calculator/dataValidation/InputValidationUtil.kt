@@ -1,12 +1,11 @@
 package com.example.calculator.dataValidation
 
-import com.example.calculator.decimalButton
+import com.example.calculator.DECIMAL_BUTTON
 import com.example.calculator.extensions.operationsRegex
 import com.example.calculator.extensions.removeLeadingZeros
 import com.example.calculator.extensions.removeTrailingDecimals
 import com.example.calculator.extensions.replaceLast
-import com.example.calculator.percentButton
-import kotlin.math.exp
+import com.example.calculator.PERCENT_BUTTON
 
 fun getUpdatedExpression(
 	expression: String,
@@ -14,9 +13,9 @@ fun getUpdatedExpression(
 	newInput: String
 ): String {
 	 val updatedExpression =  when {
-		 newInput == percentButton ->
+		 newInput == PERCENT_BUTTON ->
 			 validatePercentage(expression.removeTrailingDecimals(), currentValue, newInput)
-		 newInput == decimalButton ->
+		 newInput == DECIMAL_BUTTON ->
 			 validateDecimal(expression)
 		 isDigit(newInput) ->
 			 validateNumber(expression.removeLeadingZeros(), newInput)
@@ -36,7 +35,7 @@ private fun validatePercentage(
 	return when {
 		// If performing a percentage operation on an expression that was already converted to percent
 		// Then use the current value of the previous calculation for the next calculation
-		lastEntry == percentButton -> currentValue + newInput
+		lastEntry == PERCENT_BUTTON -> currentValue + newInput
 		isOperation(lastEntry) -> expression.replaceLast(newInput)
 		else -> expression + newInput
 	}
@@ -49,7 +48,7 @@ private fun validateNumber(
 	return when {
 		// If appending a digit to an operation that computed the percentage of a value
 		// Then clear the previous entry and return the new input
-		expression.contains(percentButton) -> newInput
+		expression.contains(PERCENT_BUTTON) -> newInput
 
 		else -> expression + newInput
 	}
@@ -57,19 +56,19 @@ private fun validateNumber(
 
 private fun validateDecimal(expression: String): String {
 	// Correct notation has a zero before a decimal
-	if (expression.isEmpty()) return "0$decimalButton"
+	if (expression.isEmpty()) return "0$DECIMAL_BUTTON"
 
 	val values = expression.split(operationsRegex)
 
 	return when {
 		// Correct notation has a zero before a decimal
-		values.last().isEmpty() -> expression + "0$decimalButton"
+		values.last().isEmpty() -> expression + "0$DECIMAL_BUTTON"
 
 		// Decimals can only be added once in a single number
-		values.last().contains(decimalButton) -> expression
+		values.last().contains(DECIMAL_BUTTON) -> expression
 
 		// Append the decimal
-		else -> "$expression$decimalButton"
+		else -> "$expression$DECIMAL_BUTTON"
 	}
 }
 
@@ -81,11 +80,11 @@ private fun validateOperation(
 	val lastEntry = expression.last().toString()
 
 	return when {
-		lastEntry == percentButton -> currentValue + newInput
+		lastEntry == PERCENT_BUTTON -> currentValue + newInput
 		isOperation(lastEntry) -> expression.replaceLast(newInput)
 		else -> expression + newInput
 	}
 }
 
-private fun isDigit(entry: String) = entry.matches("[0-9]".toRegex())
+private fun isDigit(entry: String) = entry.matches("\\d".toRegex())
 private fun isOperation(entry: String) = entry.matches(operationsRegex)

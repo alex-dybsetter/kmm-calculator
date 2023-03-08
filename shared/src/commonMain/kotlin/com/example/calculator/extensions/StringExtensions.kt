@@ -5,11 +5,11 @@ import com.example.calculator.Calculator
 val operationsRegex =
 	"[${Calculator.Operation.SUBTRACT.symbol}${Calculator.Operation.ADD.symbol}${Calculator.Operation.MULTIPLY.symbol}${Calculator.Operation.DIVIDE.symbol}]".toRegex()
 
-fun String.deleteLast() : String {
+fun String.deleteLast(): String {
 	return if (length > 1) this.substring(0, this.lastIndex) else "0"
 }
 
-fun String.replaceLast(newChar: String) : String {
+fun String.replaceLast(newChar: String): String {
 	return this.deleteLast() + newChar
 }
 

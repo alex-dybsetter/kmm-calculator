@@ -16,8 +16,8 @@ import com.example.calculator.dataValidation.getUpdatedExpression
 
 @Composable
 fun BasicCalculator(calculator: Calculator) {
-	var expression by remember { mutableStateOf(defaultInput) }
-	var calculation by remember { mutableStateOf(defaultOutput) }
+	var expression by remember { mutableStateOf(DEFAULT_INPUT) }
+	var calculation by remember { mutableStateOf(DEFAULT_OUTPUT) }
 	val operations = calculator.getArithmeticOperators()
 
 	val onInputUpdated = { input: String ->
@@ -45,16 +45,16 @@ fun BasicCalculator(calculator: Calculator) {
 			Row(modifier = equalDistributionModifier) {
 				OutlinedButton(
 					modifier = equalDistributionModifier,
-					text = allCancelButton,
+					text = ALL_CANCEL_BUTTON,
 					colorScheme = expressionModifierButtonStyle()
 				) {
-					expression = defaultInput
-					calculation = defaultOutput
+					expression = DEFAULT_INPUT
+					calculation = DEFAULT_OUTPUT
 				}
 
 				OutlinedButton(
 					modifier = equalDistributionModifier,
-					text = deleteButton,
+					text = DELETE_BUTTON,
 					colorScheme = expressionModifierButtonStyle()
 				) {
 					expression = expression.deleteLast()
@@ -63,10 +63,10 @@ fun BasicCalculator(calculator: Calculator) {
 
 				OutlinedButton(
 					modifier = equalDistributionModifier,
-					text = percentButton,
+					text = PERCENT_BUTTON,
 					colorScheme = expressionModifierButtonStyle()
 				) {
-					onInputUpdated(percentButton)
+					onInputUpdated(PERCENT_BUTTON)
 				}
 
 				OutlinedButton(
@@ -80,7 +80,10 @@ fun BasicCalculator(calculator: Calculator) {
 			NumberPad(
 				operations = operations,
 				modifier = equalDistributionModifier,
-				onButtonClick = onInputUpdated
+				onNumberButtonClick = onInputUpdated,
+				onOperationButtonClick = { input ->
+					expression = getUpdatedExpression(expression, calculation, input)
+				}
 			)
 			Row(modifier = equalDistributionModifier) {
 				OutlinedButton(
@@ -93,15 +96,15 @@ fun BasicCalculator(calculator: Calculator) {
 
 				OutlinedButton(
 					modifier = equalDistributionModifier,
-					text = decimalButton,
+					text = DECIMAL_BUTTON,
 					colorScheme = numberButtonStyle()
 				) {
-					onInputUpdated(decimalButton)
+					onInputUpdated(DECIMAL_BUTTON)
 				}
 
 				OutlinedButton(
 					modifier = equalDistributionModifier,
-					text = equalsButton,
+					text = EQUALS_BUTTON,
 					colorScheme = operationButtonStyle()
 				) {
 					calculation = calculator.calculate(expression)
@@ -115,21 +118,22 @@ fun BasicCalculator(calculator: Calculator) {
 private fun NumberPad(
 	operations: Array<String>,
 	modifier: Modifier = Modifier,
-	onButtonClick: (String) -> Unit
+	onNumberButtonClick: (String) -> Unit,
+	onOperationButtonClick: (String) -> Unit
 ) {
 	var i = 1
 	for (x in 7 downTo 1 step 3) {
 		NumberRow(
 			firstNumInRow = x,
 			modifier = modifier,
-			onButtonClick = onButtonClick
+			onButtonClick = onNumberButtonClick
 		) {
 			val currentOperation = operations[i++]
 			OutlinedButton(
 				modifier = modifier,
 				text = currentOperation,
 				colorScheme = operationButtonStyle()
-			) { onButtonClick(currentOperation) }
+			) { onOperationButtonClick(currentOperation) }
 		}
 	}
 }
