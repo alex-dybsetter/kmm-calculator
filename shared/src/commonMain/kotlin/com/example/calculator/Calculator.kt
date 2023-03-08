@@ -1,15 +1,18 @@
 package com.example.calculator
 
+import com.example.calculator.dataValidation.formatCalculation
+import com.example.calculator.extensions.deleteLast
+
 class Calculator {
 
 	enum class Operation(val symbol: String) {
-		ADD("+"),
-		SUBTRACT("-"),
-		MULTIPLY("x"),
-		DIVIDE("/"),
+		ADD(addButton),
+		SUBTRACT(subtractButton),
+		MULTIPLY(multiplyButton),
+		DIVIDE(divideButton),
 	}
 
-	fun getOperations(): Array<String> {
+	fun getArithmeticOperators(): Array<String> {
 		return arrayOf(
 			Operation.DIVIDE.symbol,
 			Operation.MULTIPLY.symbol,
@@ -18,25 +21,15 @@ class Calculator {
 		)
 	}
 
-	fun onOperationClicked(symbol: String): String {
-		return ""
-	}
-
 	fun calculate(expression: String): String {
 		return calculateOrderOfOperations(expression)
 	}
 
-	fun numberSignChanged(expression: String): String {
-		// TODO
-		return ""
-	}
-
-	fun percentage(expression: String): String {
-		// TODO
-		return ""
-	}
-
 	private fun calculateOrderOfOperations(expression: String): String {
+		if (expression.last().toString() == percentButton) {
+			return percentage(expression.deleteLast())
+		}
+
 		// Order of operations: PEMDAS
 		// Parenthesis > Exponents > Multiplication || Division > Addition || Subtraction
 		// Ex: 2 + (1 * 5)^2 - 4 / 2
@@ -50,6 +43,12 @@ class Calculator {
 
 
 		return expression
+	}
+
+	private fun percentage(expression: String): String {
+		// TODO figure out how to resolve floating point inaccuracy
+		val result = calculate(expression).toDouble() / 100
+		return formatCalculation(result.toString())
 	}
 
 	private fun calculate(num1: Double, num2: Double, operation: Operation): Double {
@@ -75,6 +74,7 @@ class Calculator {
 	}
 
 	private fun divide(dividend: Double, divisor: Double): Double {
+		// todo figure out floating point inaccuracy
 		return dividend / divisor
 	}
 }
