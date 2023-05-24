@@ -4,6 +4,7 @@ import com.example.calculator.dataValidation.formatCalculation
 import com.example.calculator.extensions.deleteLast
 import com.example.calculator.extensions.operationsRegex
 import com.example.calculator.extensions.removeTrailingDecimals
+import com.example.calculator.extensions.truncateTrailingPointZero
 
 class Calculator {
 
@@ -28,6 +29,7 @@ class Calculator {
 	}
 
 	private fun calculateOrderOfOperations(expression: String): String {
+		println(expression)
 
 		fun createWithDelimiterRegex(delimiter: Any): Regex {
 			return "(?<=[$delimiter])|(?=[$delimiter])".toRegex()
@@ -37,7 +39,8 @@ class Calculator {
 			return numberString.isNotEmpty() && numberString.matches("\\d*\\.?\\d*".toRegex())
 		}
 
-
+		// When the last input was a percentage,
+		// Then delete the percentage symbol and calculate
 		if (expression.last().toString() == PERCENT_BUTTON) {
 			return percentage(expression.deleteLast())
 		}
@@ -52,6 +55,14 @@ class Calculator {
 		// --> 25
 
 		// todo find the inner most parenthesis
+
+		// When the expression has parenthesis
+		// Then calculate the value inside the innermost parenthesis first
+
+		// todo handle exponents
+
+		// When the expression has a ^
+		// Then apply the following number as an exponent
 
 		val regex = createWithDelimiterRegex(operationsRegex)
 		val values = expression.split(regex)
@@ -79,25 +90,15 @@ class Calculator {
 				Operation.ADD.symbol -> add(num1, num2)
 				Operation.SUBTRACT.symbol -> subtract(num1, num2)
 				else -> expression
-			}.toString() // todo format whole number to avoid results with .0 decimals
+			}.toString().truncateTrailingPointZero()
 		}
 		return ""
 	}
 
 	private fun percentage(expression: String): String {
 		// TODO figure out how to resolve floating point inaccuracy
-		val result = calculate(expression).toDouble() / 100
+		val result = calculateOrderOfOperations(expression).toDouble() / 100
 		return formatCalculation(result.toString())
-	}
-
-	private fun calculate(num1: Double, num2: Double, operation: Operation): Double {
-		if (num1 == 0.0 && num2 == 0.0) return 0.0
-		return when (operation) {
-			Operation.ADD -> add(num1, num2)
-			Operation.SUBTRACT -> subtract(num1, num2)
-			Operation.MULTIPLY -> multiply(num1, num2)
-			Operation.DIVIDE -> divide(num1, num2)
-		}
 	}
 
 	private fun add(augend: Double, addend: Double): Double {

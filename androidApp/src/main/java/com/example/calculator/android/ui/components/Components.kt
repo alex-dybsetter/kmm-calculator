@@ -23,7 +23,8 @@ fun VerticallyCenteredText(
 		Text(
 			text = text,
 			modifier = modifier.fillMaxWidth(),
-			style = textStyle
+			style = textStyle,
+			maxLines = 1 // todo shrink text to fit or show only most recent entry
 		)
 	}
 }

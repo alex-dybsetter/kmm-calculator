@@ -22,5 +22,12 @@ fun String.removeLeadingZeros(): String {
 }
 
 fun String.removeTrailingDecimals(): String {
-	return if (this.last() == '.') deleteLast() else this
+	return if (this.last() == '.') deleteLast() else this.truncateTrailingPointZero()
+}
+
+fun String.truncateTrailingPointZero(): String {
+	return if (this.endsWith(".0")) {
+		// Last value in the expression started with .0, remove it and return the expression
+		this.removeSuffix(".0")
+	} else this
 }

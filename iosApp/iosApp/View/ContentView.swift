@@ -29,11 +29,11 @@ struct ContentView: View {
                 }).buttonStyle(K.Styles.outputModifierButtonStyle)
                 
                 Button("+/-", action: {
-                    expression = calculator.numberSignChanged(expression: expression)
+//                    expression = calculator.numberSignChanged(expression: expression)
                 }).buttonStyle(K.Styles.outputModifierButtonStyle)
                 
                 Button("%", action: {
-                    expression = calculator.percentage(expression: expression)
+//                    expression = calculator.percentage(expression: expression)
                 }).buttonStyle(K.Styles.outputModifierButtonStyle)
                 
                 operationsButtons[0].buttonStyle(K.Styles.operationButtonStyle)
